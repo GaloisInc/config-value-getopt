@@ -27,7 +27,7 @@ configValueGetOpt descrs (Sections sections) =
 configValueGetOpt _ _ = ([],["invalid configuration value"])
 
 sectionToOpts :: [OptDescr a] -> Section -> Maybe (Either String a)
-sectionToOpts descrs (Section k (Atom "no")) = Nothing
+sectionToOpts _ (Section _ (Atom "no")) = Nothing
 sectionToOpts descrs (Section k v) = Just $
   let k' = Text.unpack k in
   case lookupOption k' descrs of
@@ -40,7 +40,7 @@ sectionToOpts descrs (Section k v) = Just $
 
 noArg :: String -> Value -> a -> Either String a
 noArg _ (Atom "yes") x = Right x
-noArg k v _ = Left (k ++ ": invalid parameter, expected `yes` or `no`")
+noArg k _ _ = Left (k ++ ": invalid parameter, expected `yes` or `no`")
 
 optArg :: String -> Value -> (Maybe String -> a) -> Either String a
 optArg _ (Atom "yes") f = Right (f Nothing)
