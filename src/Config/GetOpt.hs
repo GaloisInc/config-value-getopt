@@ -3,6 +3,7 @@
 module Config.GetOpt (configValueGetOpt) where
 
 import Config
+import Config.Number
 
 import Data.Either (partitionEithers)
 import Data.Foldable (find)
@@ -55,10 +56,13 @@ reqArg k v f =
     Just x -> Right (f x)
     Nothing -> Left (k ++ ": invalid parameter")
 
-valueString                :: Value p -> Maybe String
-valueString (Text _ t)      = Just (Text.unpack t)
-valueString (Number _ 10 n) = Just (show n)
-valueString _               = Nothing
+valueString :: Value p -> Maybe String
+valueString (Number _ n)
+  | Radix10 0 <- numberRadix n
+  , Just i    <- numberToInteger n
+  = Just (show i)
+valueString (Text _ t) = Just (Text.unpack t)
+valueString _            = Nothing
 
 lookupOption :: String -> [OptDescr a] -> Maybe (OptDescr a)
 lookupOption name = find $ \o -> name `elem` optionLongNames o
